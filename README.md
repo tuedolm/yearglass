@@ -43,22 +43,28 @@ public launch.
 - **`CONFIG.name`** — single point of rename (also update index.html meta,
   manifest.webmanifest, and the OG image).
 
+## Playtest deployment
+
+Live at **https://tuedolm.github.io/timeline/** (GitHub Pages from `main`).
+Deploy updates with `git push` (regenerate puzzles first if content changed).
+
 ## Launch checklist
 
+- [x] Self-hosted images (`assets/`, in-repo; move to a CDN if traffic grows)
+- [x] Privacy + photo credits page (`about.html`, linked from results)
+- [x] Absolute `og:image` URL
+- [x] CC attribution rendered on every reveal + credits page
+- [x] Hint mechanic (decade reveal, −40% of round score)
 - [ ] **Decide the name.** "Timeline" collides with Asmodee/Zygomatic's
   Timeline card game (chronology guessing, actively sold). Cleared
-  candidates as of Jul 2026: "Yearglass", "Yearshot".
-- [ ] Run `tools/fetch_images.py`, upload `assets/` to a CDN, point
-  `image_url()` in the generator at it, regenerate blobs.
-- [ ] Bank ≥90 days of puzzles via `tools/curate.html`.
-- [ ] Make `og:image` an absolute URL once the domain exists (scrapers are
-  unreliable with relative ones).
-- [ ] Deploy `infra/worker.js`, set `CONFIG.analyticsEndpoint`.
-- [ ] Add privacy policy + terms pages (analytics is anonymous by design;
-  keep it that way).
-- [ ] Verify every CC-licensed image's attribution line renders on its
-  reveal (legal requirement of CC BY / CC BY-SA).
-- [ ] Optional: service worker for offline/instant-load PWA.
+  candidates as of Jul 2026: "Yearglass", "Yearshot". Rename =
+  `CONFIG.name` + index meta + manifest + OG image + repo/domain.
+- [ ] Bank ≥90 days of puzzles via `tools/curate.html` (8 days banked now;
+  puzzle #009+ shows "no puzzle" until scheduled)
+- [ ] Deploy `infra/worker.js` (needs a Cloudflare account), set
+  `CONFIG.analyticsEndpoint`
+- [ ] Custom domain once named
+- [ ] Optional: service worker for offline/instant-load PWA
 
 ## Content rules (from the PRD, enforced by the generator)
 
