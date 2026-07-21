@@ -9,6 +9,7 @@
  * anonymous event. Keep it that way — it is why the game needs no consent UI.
  *
  * Events accepted (see track() in app.js):
+ *   {e:"visit",    d:"2026-07-21", n:1}            // once per browser per day
  *   {e:"round",    d:"2026-07-21", n:1, r:1, err:4, pts:3567, hint:0}
  *   {e:"complete", d:"2026-07-21", n:1, total:15573}
  *   {e:"hint",     d:"2026-07-21", n:1, r:2}
@@ -30,7 +31,7 @@ const CORS = {
   "Access-Control-Allow-Headers": "content-type",
 };
 
-const KINDS = ["round", "complete", "hint", "share"];
+const KINDS = ["visit", "round", "complete", "hint", "share"];
 
 export default {
   async fetch(request, env) {
@@ -55,8 +56,17 @@ export default {
       const shares = await env.DB.prepare(
         "SELECT n, COUNT(*) AS shares FROM events WHERE e='share' GROUP BY n ORDER BY n"
       ).all();
+      // Daily actives: visitors = distinct browsers that opened the game that
+      // day (client fires "visit" once per browser per day); plays = finished
+      // games. visitors − plays ≈ people who bounced or didn't finish.
+      const daily = await env.DB.prepare(
+        "SELECT d, " +
+        "SUM(CASE WHEN e='visit' THEN 1 ELSE 0 END) AS visitors, " +
+        "SUM(CASE WHEN e='complete' THEN 1 ELSE 0 END) AS plays " +
+        "FROM events WHERE e IN ('visit','complete') GROUP BY d ORDER BY d"
+      ).all();
       return new Response(
-        JSON.stringify({ puzzles: completes.results, rounds: rounds.results, shares: shares.results }, null, 2),
+        JSON.stringify({ daily: daily.results, puzzles: completes.results, rounds: rounds.results, shares: shares.results }, null, 2),
         { headers: { ...CORS, "content-type": "application/json" } },
       );
     }

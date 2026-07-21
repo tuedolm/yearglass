@@ -80,6 +80,7 @@
   const KEY_STATE = "tl.state";
   const KEY_STATS = "tl.stats";
   const KEY_HELP = "tl.helpSeen";
+  const KEY_VISIT = "tl.lastVisit";
 
   function loadJSON(key, fallback) {
     try {
@@ -537,6 +538,12 @@
     }
 
     els.puzzleLabel.textContent = `#${String(puzzle.number).padStart(3, "0")}`;
+
+    // Daily-active signal: once per browser per UTC day, no identifiers.
+    if (loadJSON(KEY_VISIT, "") !== todayStr) {
+      saveJSON(KEY_VISIT, todayStr);
+      track("visit", { n: puzzle.number });
+    }
 
     const state = loadJSON(KEY_STATE, null);
     if (state && state.date === todayStr && Array.isArray(state.results)) {
