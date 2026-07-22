@@ -49,9 +49,19 @@ previously rejected. What survives is a review queue — you still decide whethe
 each photo makes a *good puzzle*. `schedule_next.py` deals images round-robin by
 difficulty so every day gets its own easy → hard curve.
 
-`--preset everyday` sweeps categories full of ordinary human scenes (fashion,
-kitchens, living rooms, malls, street photography), which is where the best
-material lives.
+Two presets target the material that actually makes good rounds:
+
+```sh
+python3 tools/harvest.py --preset outdoor   # street scenes, high streets, parades, seafronts
+python3 tools/harvest.py --preset history   # non-US documentary archives (Anefo, Bundesarchiv, Deutsche Fotothek)
+```
+
+`outdoor` is deliberately outdoor-only. A street gives a player far more to
+reason from — signage, vehicles, shopfronts, clothing — than a living room
+does, so indoor categories were removed. `history` targets press and state
+photography, which is where documented background stories live, and is
+non-US on purpose. `--depth` (default 1) descends into subcategories, because
+several of the richest archives hold no files directly.
 
 ### Datable, not famous
 
@@ -65,6 +75,31 @@ easiest to date, so a library selected for famous events drifts straight back
 to being too easy. An anonymous 1989 kitchen has no story in the news sense and
 is superb material: the appliances, worktops and television date it to within a
 few years, and the reveal gets to explain exactly that.
+
+### Never guess a year
+
+A wrong year is scored against real players and is the one error the game
+cannot survive, so the harvester refuses to guess. A photo's year is only
+assigned when two independent sources agree (filename, description, metadata
+date); otherwise the candidate arrives with the year **blank** and marked
+"you must set it" in the review card. Anything hedged with *circa* or
+*approx* is dropped outright, since it can never yield an honest answer.
+
+This exists because a real harvest offered a Sarajevo street scene from the
+1930s carrying the year **2022** — its date field was the scanner's timestamp,
+and its description said "ca. 1933". Date fields with a clock time are now
+treated as digitisation timestamps rather than evidence.
+
+### Also dropped automatically
+
+- **Atrocity and graphic death** — ghettos, camps, executions, Nazi subjects.
+  Weighty history is fine (the library holds D-Day and Hindenburg); asking
+  someone to guess the year of a massacre is not.
+- **Non-photographs** — paintings, engravings, maps and manuscripts, which
+  archives hold alongside photographs and which carry no photographic era
+  cues. Terms include German, since the best non-US archives are German.
+- **No description *and* no confirmable year** — fails both tests at once:
+  nothing to build a story from, nothing to date it by.
 
 Two guards keep quality honest:
 
